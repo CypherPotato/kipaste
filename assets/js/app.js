@@ -57,12 +57,34 @@ function normalizeViewMode(value) {
     return 'condensed';
 }
 
+function setDefaultLanguageSelection() {
+    const hasPlaintextOption = elements.languageSelect.querySelector('option[value="plaintext"]') !== null;
+
+    if (hasPlaintextOption) {
+        elements.languageSelect.value = 'plaintext';
+        return;
+    }
+
+    if (elements.languageSelect.options.length > 0) {
+        elements.languageSelect.selectedIndex = 0;
+    }
+}
+
 function initializeSelects() {
     const groupedLanguages = new Map();
+    const priorityLanguages = new Map();
+    const priorityLanguageKeys = ['plaintext', 'markdown'];
     const languages = Object.entries(appConfig.languages);
 
     for (const [value, label] of languages) {
         const normalizedLabel = String(label).trim();
+        const normalizedValue = String(value).toLowerCase();
+
+        if (priorityLanguageKeys.includes(normalizedValue)) {
+            priorityLanguages.set(normalizedValue, { value, label: normalizedLabel });
+            continue;
+        }
+
         const initialCharacter = normalizedLabel.charAt(0).toUpperCase();
         const groupLabel = /^[A-Z]$/.test(initialCharacter) ? initialCharacter : '#';
 
@@ -84,6 +106,25 @@ function initializeSelects() {
 
         return left.localeCompare(right, undefined, { sensitivity: 'base' });
     });
+
+    if (priorityLanguages.size > 0) {
+        const priorityGroup = document.createElement('optgroup');
+        priorityGroup.label = 'Text';
+
+        for (const languageKey of priorityLanguageKeys) {
+            const option = priorityLanguages.get(languageKey);
+            if (option === undefined) {
+                continue;
+            }
+
+            const optionElement = document.createElement('option');
+            optionElement.value = option.value;
+            optionElement.textContent = option.label;
+            priorityGroup.append(optionElement);
+        }
+
+        elements.languageSelect.append(priorityGroup);
+    }
 
     for (const groupLabel of sortedGroupLabels) {
         const groupElement = document.createElement('optgroup');
@@ -109,6 +150,7 @@ function initializeSelects() {
         elements.expirationSelect.append(optionElement);
     }
 
+    setDefaultLanguageSelection();
     elements.expirationSelect.value = appConfig.defaultExpiration;
 }
 
@@ -119,6 +161,75 @@ function showStatus(message) {
     window.setTimeout(() => {
         elements.statusMessage.classList.remove('visible');
     }, 1600);
+}
+
+function formatViewCount(visitCount) {
+    const parsedCount = Number(visitCount);
+    const normalizedCount = Number.isFinite(parsedCount) ? Math.max(0, Math.trunc(parsedCount)) : 0;
+    const suffix = normalizedCount === 1 ? 'view' : 'views';
+    return `${normalizedCount} ${suffix}`;
+}
+
+function formatRemainingTime(expiresAt) {
+    const expirationTime = Date.parse(typeof expiresAt === 'string' ? expiresAt : '');
+    if (Number.isNaN(expirationTime)) {
+        return 'expires soon';
+    }
+
+    const remainingMs = expirationTime - Date.now();
+    if (remainingMs <= 0) {
+        return 'expired';
+    }
+
+    const totalMinutes = Math.ceil(remainingMs / 60000);
+    if (totalMinutes < 60) {
+        return `expires in ${totalMinutes}m`;
+    }
+
+    const totalHours = Math.ceil(totalMinutes / 60);
+    if (totalHours < 24) {
+        return `expires in ${totalHours}h`;
+    }
+
+    const totalDays = Math.ceil(totalHours / 24);
+    return `expires in ${totalDays}d`;
+}
+
+function createPillSeparator() {
+    const separator = document.createElement('span');
+    separator.className = 'pill-separator';
+    separator.setAttribute('aria-hidden', 'true');
+    return separator;
+}
+
+function renderPasteMetaPill(paste) {
+    const slugButton = document.createElement('button');
+    slugButton.type = 'button';
+    slugButton.className = 'pill-link';
+    slugButton.dataset.action = 'copy-paste-url';
+    slugButton.textContent = paste.slug;
+    slugButton.title = 'Copy paste URL';
+    slugButton.setAttribute('aria-label', 'Copy paste URL');
+
+    const views = document.createElement('span');
+    views.className = 'pill-text';
+    views.textContent = formatViewCount(paste.visitCount);
+
+    const expiration = document.createElement('span');
+    expiration.className = 'pill-text';
+    expiration.textContent = formatRemainingTime(paste.expiresAt);
+
+    elements.visitCounter.replaceChildren(
+        slugButton,
+        createPillSeparator(),
+        views,
+        createPillSeparator(),
+        expiration,
+    );
+}
+
+function buildPasteUrl(slug) {
+    return new URL(toPagePath(slug), window.location.origin).toString();
 }
 
 async function resolveRecaptchaToken() {
@@ -221,8 +332,26 @@ function initializeTheme() {
     }
 }
 
+function setRecaptchaBadgeHidden(hidden) {
+    const recaptchaBadges = document.querySelectorAll('.grecaptcha-badge');
+    for (const badge of recaptchaBadges) {
+        if (!(badge instanceof HTMLElement)) {
+            continue;
+        }
+
+        if (hidden) {
+            badge.style.display = 'none';
+            continue;
+        }
+
+        badge.style.removeProperty('display');
+    }
+}
+
 function setEditorMode() {
     state.currentPaste = null;
+    setRecaptchaBadgeHidden(false);
+    setDefaultLanguageSelection();
 
     elements.topbar?.classList.remove('paste-toolbar-centered');
     elements.topbarLeft?.classList.remove('hidden');
@@ -237,12 +366,14 @@ function setEditorMode() {
     elements.deleteButton.classList.add('hidden');
     elements.createButton.classList.add('hidden');
     elements.visitCounter.classList.add('hidden');
+    elements.visitCounter.replaceChildren();
 
     editorView.focus();
 }
 
 function setPasteMode(paste) {
     state.currentPaste = paste;
+    setRecaptchaBadgeHidden(true);
 
     elements.topbar?.classList.add('paste-toolbar-centered');
     elements.topbarLeft?.classList.add('hidden');
@@ -256,7 +387,7 @@ function setPasteMode(paste) {
     elements.forkButton.classList.remove('hidden');
     elements.createButton.classList.remove('hidden');
     elements.visitCounter.classList.remove('hidden');
-    elements.visitCounter.textContent = `${paste.visitCount} views`;
+    renderPasteMetaPill(paste);
 
     elements.deleteButton.classList.toggle('hidden', !paste.canDelete);
     elements.languageSelect.value = paste.language;
@@ -317,6 +448,33 @@ async function copyPaste() {
     }
 }
 
+async function copyPasteUrl() {
+    if (state.currentPaste === null) {
+        return;
+    }
+
+    try {
+        await navigator.clipboard.writeText(buildPasteUrl(state.currentPaste.slug));
+        showStatus('URL copied');
+    } catch {
+        showStatus('Copy failed');
+    }
+}
+
+function handleVisitCounterClick(event) {
+    const target = event.target;
+    if (!(target instanceof Element)) {
+        return;
+    }
+
+    const copyTrigger = target.closest('[data-action="copy-paste-url"]');
+    if (copyTrigger === null) {
+        return;
+    }
+
+    copyPasteUrl();
+}
+
 function downloadPaste() {
     if (state.currentPaste === null) {
         return;
@@ -374,6 +532,7 @@ function createNewPaste() {
 
 function registerEvents() {
     elements.savePasteButton.addEventListener('click', savePaste);
+    elements.visitCounter.addEventListener('click', handleVisitCounterClick);
     elements.downloadButton.addEventListener('click', downloadPaste);
     elements.copyButton.addEventListener('click', copyPaste);
     elements.forkButton.addEventListener('click', forkPaste);

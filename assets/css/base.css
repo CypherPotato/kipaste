@@ -83,6 +83,9 @@ body {
 }
 
 .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
     height: 56px;
     border-bottom: 1px solid var(--border);
     background: var(--topbar-bg);
@@ -313,9 +316,46 @@ body {
     border: 1px solid var(--border);
     background: var(--surface-soft);
     border-radius: 999px;
-    padding: 6px 10px;
+    padding: 6px 12px;
     color: var(--muted);
     font-size: 13px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+}
+
+.pill-text {
+    line-height: 1;
+}
+
+.pill-link {
+    border: 0;
+    padding: 0;
+    margin: 0;
+    background: transparent;
+    color: var(--text);
+    font: inherit;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.pill-link:hover {
+    text-decoration: underline;
+}
+
+.pill-link:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+.pill-separator {
+    width: 4px;
+    height: 4px;
+    border-radius: 999px;
+    background: var(--border-hover);
+    flex: 0 0 auto;
 }
 
 .status-message {

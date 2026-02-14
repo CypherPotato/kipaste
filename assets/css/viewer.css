@@ -12,6 +12,7 @@
     padding: 20px;
     border: 0;
     background: transparent !important;
+    overflow: auto;
 }
 
 .viewer-pre code {
@@ -19,6 +20,23 @@
     line-height: 1.65;
     white-space: pre-wrap;
     word-break: break-word;
+}
+
+.viewer-pre.line-numbers code {
+    white-space: pre;
+    word-break: normal;
+    overflow-wrap: normal;
+}
+
+.viewer-pre.line-numbers {
+    font-size: 14px;
+    line-height: 1.65;
+}
+
+.viewer-pre.line-numbers > code,
+.viewer-pre.line-numbers .line-numbers-rows {
+    font-size: 1em;
+    line-height: inherit;
 }
 
 .viewer-markdown {

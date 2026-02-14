@@ -6,15 +6,19 @@ export class PasteView {
     }
 
     render(paste) {
-        if ((paste.language || '').toLowerCase() === 'markdown') {
+        const normalizedLanguage = String(paste.language || '').toLowerCase();
+        if (normalizedLanguage === 'markdown') {
             this.renderMarkdown(paste.content);
             return;
         }
 
+        this.setLineNumbersEnabled(normalizedLanguage !== 'plaintext');
         this.markdownElement.classList.add('hidden');
         this.codeWrapElement.classList.remove('hidden');
-        this.codeElement.textContent = paste.content;
+        const codeContent = typeof paste.content === 'string' ? paste.content : '';
+        this.codeElement.textContent = codeContent;
         this.codeElement.className = `language-${paste.language || 'plaintext'}`;
+        this.clearLineNumberRows();
 
         if (window.Prism?.highlightElement) {
             window.Prism.highlightElement(this.codeElement);
@@ -23,6 +27,8 @@ export class PasteView {
 
     renderMarkdown(content) {
         this.codeWrapElement.classList.add('hidden');
+        this.setLineNumbersEnabled(false);
+        this.clearLineNumberRows();
         this.markdownElement.classList.remove('hidden');
 
         const markdownContent = typeof content === 'string' ? content : '';
@@ -38,5 +44,16 @@ export class PasteView {
             : parsedHtml;
 
         this.markdownElement.innerHTML = sanitizedHtml;
+    }
+
+    setLineNumbersEnabled(enabled) {
+        this.codeWrapElement.classList.toggle('line-numbers', enabled);
+    }
+
+    clearLineNumberRows() {
+        const lineNumberRows = this.codeWrapElement.querySelector('.line-numbers-rows');
+        if (lineNumberRows !== null) {
+            lineNumberRows.remove();
+        }
     }
 }

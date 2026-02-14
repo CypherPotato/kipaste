@@ -39,8 +39,8 @@ final class PageController
             <link
                 href="https://cdn.jsdelivr.net/npm/remixicon@4.9.0/fonts/remixicon.css"
                 rel="stylesheet" />
-            <link id="prismLightTheme" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css">
-            <link id="prismDarkTheme" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css" disabled>
+            <link id="prismLightTheme" rel="stylesheet" href="<?= htmlspecialchars($basePath, ENT_QUOTES) ?>/assets/js/vendor/prism.css">
+            <link id="prismDarkTheme" rel="stylesheet" href="<?= htmlspecialchars($basePath, ENT_QUOTES) ?>/assets/js/vendor/prism.dark.css" disabled>
             <link rel="stylesheet" href="<?= htmlspecialchars($basePath, ENT_QUOTES) ?>/assets/css/base.css">
             <link rel="stylesheet" href="<?= htmlspecialchars($basePath, ENT_QUOTES) ?>/assets/css/editor.css">
             <link rel="stylesheet" href="<?= htmlspecialchars($basePath, ENT_QUOTES) ?>/assets/css/viewer.css">
@@ -84,7 +84,7 @@ final class PageController
 
                 <div class="topbar-right">
                     <span id="visitCounter" class="pill hidden" aria-live="polite"></span>
-                    
+
                     <span class="toolbar-spacer" aria-hidden="true"></span>
 
                     <button id="downloadBtn" class="btn-icon hidden" type="button" aria-label="Download raw">
@@ -135,8 +135,7 @@ final class PageController
             <script>
                 window.__APP_CONFIG = <?= $jsonConfig ?>;
             </script>
-            <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-core.min.js"></script>
-            <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+            <script src="<?= htmlspecialchars($basePath, ENT_QUOTES) ?>/assets/js/vendor/prism.js"></script>
             <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
             <script src="https://cdn.jsdelivr.net/npm/dompurify@3.2.6/dist/purify.min.js"></script>
             <?php if ($this->recaptchaSiteKey !== null && $this->recaptchaSiteKey !== ''): ?>
