@@ -53,7 +53,30 @@ return [
     'recaptchaService' => $recaptchaService,
     'recaptchaSiteKey' => $recaptchaService->siteKey(),
     'maxPasteChars' => $maxPasteChars,
+    'assetVersion' => resolveAssetVersion($projectRoot),
 ];
+
+function resolveAssetVersion(string $projectRoot): string
+{
+    $headFile = $projectRoot . '/.git/HEAD';
+    if (!is_file($headFile)) {
+        return '0';
+    }
+
+    $head = trim((string) file_get_contents($headFile));
+
+    if (str_starts_with($head, 'ref: ')) {
+        $refFile = $projectRoot . '/.git/' . substr($head, 5);
+        if (!is_file($refFile)) {
+            return '0';
+        }
+        $hash = trim((string) file_get_contents($refFile));
+    } else {
+        $hash = $head;
+    }
+
+    return substr($hash, 0, 8);
+}
 
 function loadEnvFile(string $filePath): void
 {

@@ -12,6 +12,7 @@ final class PageController
         private readonly SupportedOptions $options,
         private readonly ?string $recaptchaSiteKey,
         private readonly int $maxPasteChars = 50000,
+        private readonly string $assetVersion = '0',
     ) {}
 
     public function render(string $basePath, ?string $initialPasteSlug): void
@@ -29,6 +30,8 @@ final class PageController
         ];
 
         $jsonConfig = json_encode($config, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        $bp = htmlspecialchars($basePath, ENT_QUOTES);
+        $v  = htmlspecialchars($this->assetVersion, ENT_QUOTES);
 ?>
         <!doctype html>
         <html lang="en" data-theme="system">
@@ -41,11 +44,11 @@ final class PageController
             <link
                 href="https://cdn.jsdelivr.net/npm/remixicon@4.9.0/fonts/remixicon.css"
                 rel="stylesheet" />
-            <link id="prismLightTheme" rel="stylesheet" href="<?= htmlspecialchars($basePath, ENT_QUOTES) ?>/assets/js/vendor/prism.css">
-            <link id="prismDarkTheme" rel="stylesheet" href="<?= htmlspecialchars($basePath, ENT_QUOTES) ?>/assets/js/vendor/prism.dark.css" disabled>
-            <link rel="stylesheet" href="<?= htmlspecialchars($basePath, ENT_QUOTES) ?>/assets/css/base.css">
-            <link rel="stylesheet" href="<?= htmlspecialchars($basePath, ENT_QUOTES) ?>/assets/css/editor.css">
-            <link rel="stylesheet" href="<?= htmlspecialchars($basePath, ENT_QUOTES) ?>/assets/css/viewer.css">
+            <link id="prismLightTheme" rel="stylesheet" href="<?= $bp ?>/assets/js/vendor/prism.css?v=<?= $v ?>">
+            <link id="prismDarkTheme" rel="stylesheet" href="<?= $bp ?>/assets/js/vendor/prism.dark.css?v=<?= $v ?>" disabled>
+            <link rel="stylesheet" href="<?= $bp ?>/assets/css/base.css?v=<?= $v ?>">
+            <link rel="stylesheet" href="<?= $bp ?>/assets/css/editor.css?v=<?= $v ?>">
+            <link rel="stylesheet" href="<?= $bp ?>/assets/css/viewer.css?v=<?= $v ?>">
         </head>
 
         <body>
@@ -137,13 +140,13 @@ final class PageController
             <script>
                 window.__APP_CONFIG = <?= $jsonConfig ?>;
             </script>
-            <script src="<?= htmlspecialchars($basePath, ENT_QUOTES) ?>/assets/js/vendor/prism.js"></script>
+            <script src="<?= $bp ?>/assets/js/vendor/prism.js?v=<?= $v ?>"></script>
             <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
             <script src="https://cdn.jsdelivr.net/npm/dompurify@3.2.6/dist/purify.min.js"></script>
             <?php if ($this->recaptchaSiteKey !== null && $this->recaptchaSiteKey !== ''): ?>
                 <script src="https://www.google.com/recaptcha/api.js?render=<?= urlencode($this->recaptchaSiteKey) ?>"></script>
             <?php endif; ?>
-            <script type="module" src="<?= htmlspecialchars($basePath, ENT_QUOTES) ?>/assets/js/app.js"></script>
+            <script type="module" src="<?= $bp ?>/assets/js/app.js?v=<?= $v ?>"></script>
         </body>
 
         </html>
