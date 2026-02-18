@@ -70,6 +70,7 @@ body {
     background: var(--bg);
     color: var(--text);
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    user-select: none;
 }
 
 body {
@@ -97,6 +98,15 @@ body {
     gap: 10px;
     padding: 0 14px;
     flex-shrink: 0;
+    transition: opacity 0.25s ease;
+}
+
+.topbar.topbar-dimmed {
+    opacity: 0.4;
+}
+
+.topbar.topbar-dimmed:hover {
+    opacity: 1;
 }
 
 .topbar.paste-toolbar-centered {

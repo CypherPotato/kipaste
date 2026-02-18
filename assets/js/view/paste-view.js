@@ -1,17 +1,20 @@
 export class PasteView {
-    constructor(codeElement, codeWrapElement, markdownElement) {
+    constructor(codeElement, codeWrapElement, markdownElement, topbarElement) {
         this.codeElement = codeElement;
         this.codeWrapElement = codeWrapElement;
         this.markdownElement = markdownElement;
+        this.topbarElement = topbarElement;
     }
 
     render(paste) {
         const normalizedLanguage = String(paste.language || '').toLowerCase();
         if (normalizedLanguage === 'markdown') {
+            this.topbarElement?.classList.add('topbar-dimmed');
             this.renderMarkdown(paste.content);
             return;
         }
 
+        this.topbarElement?.classList.remove('topbar-dimmed');
         this.setLineNumbersEnabled(normalizedLanguage !== 'plaintext');
         this.markdownElement.classList.add('hidden');
         this.codeWrapElement.classList.remove('hidden');
@@ -43,7 +46,11 @@ export class PasteView {
             })
             : parsedHtml;
 
-        this.markdownElement.innerHTML = sanitizedHtml;
+        this.markdownElement.innerHTML = `<div class="viewer-markdown-inner">${sanitizedHtml}</div>`;
+
+        if (window.Prism?.highlightAllUnder) {
+            window.Prism.highlightAllUnder(this.markdownElement);
+        }
     }
 
     setLineNumbersEnabled(enabled) {

@@ -11,6 +11,7 @@ final class PageController
     public function __construct(
         private readonly SupportedOptions $options,
         private readonly ?string $recaptchaSiteKey,
+        private readonly int $maxPasteChars = 50000,
     ) {}
 
     public function render(string $basePath, ?string $initialPasteSlug): void
@@ -24,6 +25,7 @@ final class PageController
             'defaultExpiration' => $this->options->defaultExpirationKey(),
             'initialPasteSlug' => $initialPasteSlug,
             'recaptchaSiteKey' => $this->recaptchaSiteKey,
+            'maxPasteChars' => $this->maxPasteChars,
         ];
 
         $jsonConfig = json_encode($config, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
@@ -121,7 +123,7 @@ final class PageController
 
             <main id="workspace" class="workspace condensed">
                 <section id="editorSection" class="editor-panel">
-                    <textarea id="editorInput" class="editor-textarea" spellcheck="false" autocorrect="off" autocomplete="off" autocapitalize="off" aria-label="Paste editor" placeholder="Start typing..." maxlength="50000"></textarea>
+                    <textarea id="editorInput" class="editor-textarea" spellcheck="false" autocorrect="off" autocomplete="off" autocapitalize="off" aria-label="Paste editor" placeholder="Start typing..." maxlength="<?= $this->maxPasteChars ?>"></textarea>
                 </section>
 
                 <section id="viewerSection" class="viewer-panel hidden">

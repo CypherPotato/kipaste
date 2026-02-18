@@ -15,6 +15,7 @@
     color: var(--text);
     font: 15px/1.6 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
     tab-size: 4;
+    user-select: text;
 }
 
 .editor-textarea:focus {

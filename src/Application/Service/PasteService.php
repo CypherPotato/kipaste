@@ -14,12 +14,11 @@ use RuntimeException;
 
 final class PasteService
 {
-    private const MAX_CONTENT_LENGTH = 50000;
-
     public function __construct(
         private readonly PasteRepositoryInterface $repository,
         private readonly SlugService $slugService,
         private readonly SupportedOptions $options,
+        private readonly int $maxContentLength = 50000,
     ) {}
 
     public function create(string $content, string $language, string $expirationKey, string $creatorIp): Paste
@@ -30,8 +29,8 @@ final class PasteService
         }
 
         $contentLength = function_exists('mb_strlen') ? mb_strlen($content) : strlen($content);
-        if ($contentLength > self::MAX_CONTENT_LENGTH) {
-            throw new InvalidArgumentException('Paste content exceeds 50000 characters.');
+        if ($contentLength > $this->maxContentLength) {
+            throw new InvalidArgumentException("Paste content exceeds {$this->maxContentLength} characters.");
         }
 
         $supportedLanguages = $this->options->languages();

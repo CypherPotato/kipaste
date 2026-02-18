@@ -12,6 +12,7 @@ $pasteService = $container['pasteService'];
 $options = $container['options'];
 $recaptchaService = $container['recaptchaService'];
 $recaptchaSiteKey = $container['recaptchaSiteKey'];
+$maxPasteChars = $container['maxPasteChars'];
 
 $scriptName = str_replace('\\', '/', $_SERVER['SCRIPT_NAME'] ?? '/index.php');
 $basePath = str_replace('\\', '/', dirname($scriptName));
@@ -85,5 +86,5 @@ if ($rawMode) {
     exit;
 }
 
-$pageController = new PageController($options, $recaptchaSiteKey);
+$pageController = new PageController($options, $recaptchaSiteKey, $maxPasteChars);
 $pageController->render($basePath, $initialPasteSlug);

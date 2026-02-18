@@ -38,7 +38,7 @@ const elements = {
 
 const api = new PasteApi();
 const editorView = new EditorView(elements.editorInput);
-const pasteView = new PasteView(elements.viewerCode, elements.viewerCodeWrap, elements.viewerMarkdown);
+const pasteView = new PasteView(elements.viewerCode, elements.viewerCodeWrap, elements.viewerMarkdown, elements.topbar);
 
 const state = {
     currentPaste: null,

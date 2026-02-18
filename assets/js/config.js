@@ -7,6 +7,7 @@ export const appConfig = {
     defaultExpiration: rawConfig.defaultExpiration ?? '1d',
     initialPasteSlug: rawConfig.initialPasteSlug ?? null,
     recaptchaSiteKey: typeof rawConfig.recaptchaSiteKey === 'string' ? rawConfig.recaptchaSiteKey : '',
+    maxPasteChars: typeof rawConfig.maxPasteChars === 'number' ? rawConfig.maxPasteChars : 50000,
 };
 
 export function toApiPath(pathname) {

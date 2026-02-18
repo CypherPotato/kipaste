@@ -34,7 +34,8 @@ $databasePath = $databaseDirectory . '/pastes.sqlite';
 $repository = new SQLitePasteRepository($databasePath);
 $slugService = new SlugService();
 $options = new SupportedOptions();
-$pasteService = new PasteService($repository, $slugService, $options);
+$maxPasteChars = max(1, (int) (envValue('PASTE_MAX_CHARS') ?? '50000'));
+$pasteService = new PasteService($repository, $slugService, $options, $maxPasteChars);
 
 $recaptchaMinScore = (float) (envValue('RECAPTCHA_MIN_SCORE') ?? '0.5');
 $recaptchaMinScore = max(0.0, min(1.0, $recaptchaMinScore));
@@ -51,6 +52,7 @@ return [
     'options' => $options,
     'recaptchaService' => $recaptchaService,
     'recaptchaSiteKey' => $recaptchaService->siteKey(),
+    'maxPasteChars' => $maxPasteChars,
 ];
 
 function loadEnvFile(string $filePath): void
