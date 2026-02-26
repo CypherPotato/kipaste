@@ -2,6 +2,7 @@ import { appConfig, parseSlugFromLocation, toPagePath } from './config.js';
 import { PasteApi } from './api/paste-api.js';
 import { EditorView } from './editor/editor-view.js';
 import { PasteView } from './view/paste-view.js';
+import QRCode from 'https://cdn.jsdelivr.net/npm/qrcode@1.5.4/+esm';
 
 if (window.Prism?.plugins?.autoloader) {
     window.Prism.plugins.autoloader.languages_path = 'https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/';
@@ -22,6 +23,7 @@ const elements = {
     visitCounter: document.getElementById('visitCounter'),
     downloadButton: document.getElementById('downloadBtn'),
     copyButton: document.getElementById('copyBtn'),
+    qrCodeButton: document.getElementById('qrCodeBtn'),
     forkButton: document.getElementById('forkBtn'),
     deleteButton: document.getElementById('deleteBtn'),
     createButton: document.getElementById('createBtn'),
@@ -31,6 +33,10 @@ const elements = {
     viewerCodeWrap: document.getElementById('viewerCodeWrap'),
     viewerCode: document.getElementById('viewerCode'),
     viewerMarkdown: document.getElementById('viewerMarkdown'),
+    qrCodeModal: document.getElementById('qrCodeModal'),
+    qrCodeCloseButton: document.getElementById('qrCodeCloseBtn'),
+    qrCodeCanvas: document.getElementById('qrCodeCanvas'),
+    qrCodeLink: document.getElementById('qrCodeLink'),
     statusMessage: document.getElementById('statusMessage'),
     prismLightTheme: document.getElementById('prismLightTheme'),
     prismDarkTheme: document.getElementById('prismDarkTheme'),
@@ -163,6 +169,56 @@ function showStatus(message) {
     }, 1600);
 }
 
+function closeQrCodeModal() {
+    elements.qrCodeModal.classList.add('hidden');
+}
+
+async function openQrCodeModal() {
+    if (state.currentPaste === null) {
+        return;
+    }
+
+    const pasteUrl = buildPasteUrl(state.currentPaste.slug);
+    elements.qrCodeLink.href = pasteUrl;
+    elements.qrCodeLink.textContent = pasteUrl;
+
+    if (typeof QRCode?.toCanvas !== 'function') {
+        showStatus('QR Code unavailable');
+        return;
+    }
+
+    try {
+        await QRCode.toCanvas(elements.qrCodeCanvas, pasteUrl, {
+            width: 420,
+            margin: 1,
+            color: {
+                dark: '#000000',
+                light: '#ffffff',
+            },
+        });
+
+        elements.qrCodeModal.classList.remove('hidden');
+    } catch {
+        showStatus('QR Code generation failed');
+    }
+}
+
+function handleQrModalBackdropClick(event) {
+    if (event.target === elements.qrCodeModal) {
+        closeQrCodeModal();
+    }
+}
+
+function handleQrModalEscape(event) {
+    if (event.key !== 'Escape') {
+        return;
+    }
+
+    if (!elements.qrCodeModal.classList.contains('hidden')) {
+        closeQrCodeModal();
+    }
+}
+
 function formatViewCount(visitCount) {
     const parsedCount = Number(visitCount);
     const normalizedCount = Number.isFinite(parsedCount) ? Math.max(0, Math.trunc(parsedCount)) : 0;
@@ -193,6 +249,21 @@ function formatRemainingTime(expiresAt) {
 
     const totalDays = Math.ceil(totalHours / 24);
     return `expires in ${totalDays}d`;
+}
+
+function isNonMarkdownPasteActive() {
+    if (state.currentPaste === null) {
+        return false;
+    }
+
+    const normalizedLanguage = String(state.currentPaste.language || '').toLowerCase();
+    return normalizedLanguage !== 'markdown';
+}
+
+function applyWorkspaceViewMode() {
+    const effectiveViewMode = isNonMarkdownPasteActive() ? 'expanded' : state.viewMode;
+    elements.workspace.classList.remove('condensed', 'expanded');
+    elements.workspace.classList.add(effectiveViewMode);
 }
 
 function createPillSeparator() {
@@ -255,8 +326,7 @@ function setViewMode(value) {
     const normalizedViewMode = normalizeViewMode(value);
 
     state.viewMode = normalizedViewMode;
-    elements.workspace.classList.remove('condensed', 'expanded');
-    elements.workspace.classList.add(normalizedViewMode);
+    applyWorkspaceViewMode();
     elements.editorInput.wrap = normalizedViewMode === 'expanded' ? 'off' : 'soft';
 
     const isExpanded = normalizedViewMode === 'expanded';
@@ -350,6 +420,8 @@ function setRecaptchaBadgeHidden(hidden) {
 
 function setEditorMode() {
     state.currentPaste = null;
+    applyWorkspaceViewMode();
+    closeQrCodeModal();
     setRecaptchaBadgeHidden(false);
     setDefaultLanguageSelection();
 
@@ -362,6 +434,7 @@ function setEditorMode() {
     elements.themeSelectPasteWrapper.classList.add('hidden');
     elements.downloadButton.classList.add('hidden');
     elements.copyButton.classList.add('hidden');
+    elements.qrCodeButton.classList.add('hidden');
     elements.forkButton.classList.add('hidden');
     elements.deleteButton.classList.add('hidden');
     elements.createButton.classList.add('hidden');
@@ -373,6 +446,8 @@ function setEditorMode() {
 
 function setPasteMode(paste) {
     state.currentPaste = paste;
+    applyWorkspaceViewMode();
+    closeQrCodeModal();
     setRecaptchaBadgeHidden(true);
 
     elements.topbar?.classList.add('paste-toolbar-centered');
@@ -384,6 +459,7 @@ function setPasteMode(paste) {
     elements.themeSelectPasteWrapper.classList.remove('hidden');
     elements.downloadButton.classList.remove('hidden');
     elements.copyButton.classList.remove('hidden');
+    elements.qrCodeButton.classList.remove('hidden');
     elements.forkButton.classList.remove('hidden');
     elements.createButton.classList.remove('hidden');
     elements.visitCounter.classList.remove('hidden');
@@ -535,9 +611,12 @@ function registerEvents() {
     elements.visitCounter.addEventListener('click', handleVisitCounterClick);
     elements.downloadButton.addEventListener('click', downloadPaste);
     elements.copyButton.addEventListener('click', copyPaste);
+    elements.qrCodeButton.addEventListener('click', openQrCodeModal);
     elements.forkButton.addEventListener('click', forkPaste);
     elements.deleteButton.addEventListener('click', deletePaste);
     elements.createButton.addEventListener('click', createNewPaste);
+    elements.qrCodeCloseButton.addEventListener('click', closeQrCodeModal);
+    elements.qrCodeModal.addEventListener('click', handleQrModalBackdropClick);
     elements.viewModeToggleButton.addEventListener('click', toggleViewMode);
     elements.themeSelect.addEventListener('change', (event) => {
         setThemeSelection(event.target.value);
@@ -549,6 +628,7 @@ function registerEvents() {
     window.addEventListener('popstate', () => {
         loadPaste(parseSlugFromLocation());
     });
+    window.addEventListener('keydown', handleQrModalEscape);
 }
 
 function bootstrap() {

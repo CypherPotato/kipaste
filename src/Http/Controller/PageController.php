@@ -98,6 +98,9 @@ final class PageController
                     <button id="copyBtn" class="btn-icon hidden" type="button" aria-label="Copy">
                         <i class="ri-file-copy-2-line" aria-hidden="true"></i>
                     </button>
+                    <button id="qrCodeBtn" class="btn-icon hidden" type="button" aria-label="QR Code" title="QR Code">
+                        <i class="ri-qr-code-line" aria-hidden="true"></i>
+                    </button>
 
                     <span class="toolbar-spacer" aria-hidden="true"></span>
 
@@ -136,6 +139,19 @@ final class PageController
             </main>
 
             <div id="statusMessage" class="status-message" aria-live="assertive"></div>
+
+            <div id="qrCodeModal" class="qr-modal hidden" role="dialog" aria-modal="true" aria-labelledby="qrCodeTitle">
+                <div class="qr-modal-card">
+                    <div class="qr-modal-header">
+                        <h2 id="qrCodeTitle" class="qr-modal-title">QR Code</h2>
+                        <button id="qrCodeCloseBtn" class="btn-icon" type="button" aria-label="Close QR Code">
+                            <i class="ri-close-line" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                    <canvas id="qrCodeCanvas" class="qr-modal-canvas" width="420" height="420"></canvas>
+                    <a id="qrCodeLink" class="qr-modal-link" href="#" target="_blank" rel="noopener noreferrer"></a>
+                </div>
+            </div>
 
             <script>
                 window.__APP_CONFIG = <?= $jsonConfig ?>;
