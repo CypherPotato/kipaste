@@ -4,10 +4,6 @@ import { EditorView } from './editor/editor-view.js';
 import { PasteView } from './view/paste-view.js';
 import QRCode from 'https://cdn.jsdelivr.net/npm/qrcode@1.5.4/+esm';
 
-if (window.Prism?.plugins?.autoloader) {
-    window.Prism.plugins.autoloader.languages_path = 'https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/';
-}
-
 const elements = {
     topbar: document.querySelector('.topbar'),
     topbarLeft: document.querySelector('.topbar-left'),

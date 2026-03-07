@@ -32,12 +32,23 @@
 .viewer-pre.line-numbers {
     font-size: 14px;
     line-height: 1.65;
+    --viewer-line-number-gutter: 3.2em;
+    padding-left: var(--viewer-line-number-gutter);
 }
 
 .viewer-pre.line-numbers > code,
 .viewer-pre.line-numbers .line-numbers-rows {
     font-size: 1em;
     line-height: inherit;
+}
+
+.viewer-pre.line-numbers .line-numbers-rows {
+    left: calc(var(--viewer-line-number-gutter) * -1);
+    width: calc(var(--viewer-line-number-gutter) - 0.2em);
+}
+
+.viewer-pre.line-numbers .line-numbers-rows > span::before {
+    padding-right: 0.5em;
 }
 
 .viewer-markdown {
