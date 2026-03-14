@@ -55,11 +55,13 @@ Defined in `.env`:
 - `RECAPTCHA_SECRET_KEY=`
 - `RECAPTCHA_MIN_SCORE=0.5`
 - `RECAPTCHA_ACTION=create_paste`
+- `PASTE_SLUG_LENGTH=4`
 
 Notes:
 
 - If site/secret keys are empty, reCAPTCHA validation is skipped.
 - If keys are set, paste creation requires a valid reCAPTCHA v3 token.
+- Slugs use the alphabet `0-9a-z`; after more than 3 collisions in sequence, the app logs a warning and temporarily increases the slug length.
 
 ## API Endpoints
 

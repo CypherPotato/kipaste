@@ -31,6 +31,10 @@ const elements = {
     viewerMarkdown: document.getElementById('viewerMarkdown'),
     qrCodeModal: document.getElementById('qrCodeModal'),
     qrCodeCloseButton: document.getElementById('qrCodeCloseBtn'),
+    qrCodeTabQr: document.getElementById('qrCodeTabQr'),
+    qrCodeTabLink: document.getElementById('qrCodeTabLink'),
+    qrCodePanelQr: document.getElementById('qrCodePanelQr'),
+    qrCodePanelLink: document.getElementById('qrCodePanelLink'),
     qrCodeCanvas: document.getElementById('qrCodeCanvas'),
     qrCodeLink: document.getElementById('qrCodeLink'),
     statusMessage: document.getElementById('statusMessage'),
@@ -169,34 +173,49 @@ function closeQrCodeModal() {
     elements.qrCodeModal.classList.add('hidden');
 }
 
+function setQrCodeModalTab(tabName) {
+    const showQrCode = tabName === 'qr';
+
+    elements.qrCodeTabQr.classList.toggle('active', showQrCode);
+    elements.qrCodeTabLink.classList.toggle('active', !showQrCode);
+    elements.qrCodeTabQr.setAttribute('aria-selected', String(showQrCode));
+    elements.qrCodeTabLink.setAttribute('aria-selected', String(!showQrCode));
+    elements.qrCodePanelQr.classList.toggle('hidden', !showQrCode);
+    elements.qrCodePanelLink.classList.toggle('hidden', showQrCode);
+}
+
 async function openQrCodeModal() {
     if (state.currentPaste === null) {
         return;
     }
 
     const pasteUrl = buildPasteUrl(state.currentPaste.slug);
+    const displayPasteUrl = pasteUrl.replace(/^https?:\/\//i, '');
     elements.qrCodeLink.href = pasteUrl;
-    elements.qrCodeLink.textContent = pasteUrl;
+    elements.qrCodeLink.textContent = displayPasteUrl;
+    let preferredTab = 'link';
 
-    if (typeof QRCode?.toCanvas !== 'function') {
+    if (typeof QRCode?.toCanvas === 'function') {
+        try {
+            await QRCode.toCanvas(elements.qrCodeCanvas, pasteUrl, {
+                width: 420,
+                margin: 1,
+                color: {
+                    dark: '#000000',
+                    light: '#ffffff',
+                },
+            });
+
+            preferredTab = 'qr';
+        } catch {
+            showStatus('QR Code generation failed');
+        }
+    } else {
         showStatus('QR Code unavailable');
-        return;
     }
 
-    try {
-        await QRCode.toCanvas(elements.qrCodeCanvas, pasteUrl, {
-            width: 420,
-            margin: 1,
-            color: {
-                dark: '#000000',
-                light: '#ffffff',
-            },
-        });
-
-        elements.qrCodeModal.classList.remove('hidden');
-    } catch {
-        showStatus('QR Code generation failed');
-    }
+    setQrCodeModalTab(preferredTab);
+    elements.qrCodeModal.classList.remove('hidden');
 }
 
 function handleQrModalBackdropClick(event) {
@@ -612,6 +631,12 @@ function registerEvents() {
     elements.deleteButton.addEventListener('click', deletePaste);
     elements.createButton.addEventListener('click', createNewPaste);
     elements.qrCodeCloseButton.addEventListener('click', closeQrCodeModal);
+    elements.qrCodeTabQr.addEventListener('click', () => {
+        setQrCodeModalTab('qr');
+    });
+    elements.qrCodeTabLink.addEventListener('click', () => {
+        setQrCodeModalTab('link');
+    });
     elements.qrCodeModal.addEventListener('click', handleQrModalBackdropClick);
     elements.viewModeToggleButton.addEventListener('click', toggleViewMode);
     elements.themeSelect.addEventListener('change', (event) => {

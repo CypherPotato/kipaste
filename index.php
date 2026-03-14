@@ -53,15 +53,18 @@ if (str_starts_with($requestPath, '/api/')) {
 
 $initialPasteSlug = null;
 if (isset($_GET['paste']) && is_string($_GET['paste']) && $_GET['paste'] !== '') {
-    $initialPasteSlug = preg_replace('/[^a-f0-9]/', '', $_GET['paste']);
+    $initialPasteSlug = strtolower((string) preg_replace('/[^a-z0-9]/i', '', $_GET['paste']));
+    if ($initialPasteSlug === '') {
+        $initialPasteSlug = null;
+    }
 }
 
-if ($initialPasteSlug === null && preg_match('#^/p/([a-f0-9]+)$#', $requestPath, $matches) === 1) {
-    $initialPasteSlug = $matches[1];
+if ($initialPasteSlug === null && preg_match('#^/p/([a-z0-9]+)$#i', $requestPath, $matches) === 1) {
+    $initialPasteSlug = strtolower($matches[1]);
 }
 
-if ($initialPasteSlug === null && preg_match('#^/([a-f0-9]+)$#', $requestPath, $matches) === 1) {
-    $initialPasteSlug = $matches[1];
+if ($initialPasteSlug === null && preg_match('#^/([a-z0-9]+)$#i', $requestPath, $matches) === 1) {
+    $initialPasteSlug = strtolower($matches[1]);
 }
 
 $rawMode = isset($_GET['raw']) && (string) $_GET['raw'] === '1';

@@ -43,21 +43,16 @@ final class PasteService
             $expirationKey = $this->options->defaultExpirationKey();
         }
 
-        $slug = $this->nextAvailableSlug();
         $createdAt = new DateTimeImmutable('now');
         $expiresAt = $createdAt->add(new DateInterval('PT' . $expirations[$expirationKey] . 'S'));
 
-        return $this->repository->create(new Paste(
-            id: null,
-            slug: $slug,
+        return $this->createPasteWithUniqueSlug(
             content: $content,
             language: $language,
             createdAt: $createdAt,
             expiresAt: $expiresAt,
             creatorIp: $creatorIp,
-            visitCount: 0,
-            deleted: false,
-        ));
+        );
     }
 
     public function view(string $slug, string $viewerIp): ?array
@@ -120,15 +115,63 @@ final class PasteService
         return $this->repository->purgeExpired();
     }
 
-    private function nextAvailableSlug(): string
-    {
-        for ($attempt = 0; $attempt < 5; $attempt++) {
-            $slug = $this->slugService->generate();
-            if ($this->repository->findBySlug($slug) === null) {
-                return $slug;
+    private function createPasteWithUniqueSlug(
+        string $content,
+        string $language,
+        DateTimeImmutable $createdAt,
+        DateTimeImmutable $expiresAt,
+        string $creatorIp,
+    ): Paste {
+        $slugLength = $this->slugService->defaultLength();
+        $conflicts = 0;
+
+        for ($attempt = 0; $attempt < 32; $attempt++) {
+            $slug = $this->slugService->generate($slugLength);
+
+            if ($this->repository->findBySlug($slug) !== null) {
+                [$slugLength, $conflicts] = $this->handleSlugConflict($slugLength, $conflicts + 1);
+                continue;
+            }
+
+            try {
+                return $this->repository->create(new Paste(
+                    id: null,
+                    slug: $slug,
+                    content: $content,
+                    language: $language,
+                    createdAt: $createdAt,
+                    expiresAt: $expiresAt,
+                    creatorIp: $creatorIp,
+                    visitCount: 0,
+                    deleted: false,
+                ));
+            } catch (\Throwable $throwable) {
+                if ($this->repository->findBySlug($slug) === null) {
+                    throw $throwable;
+                }
+
+                [$slugLength, $conflicts] = $this->handleSlugConflict($slugLength, $conflicts + 1);
             }
         }
 
-        throw new RuntimeException('Failed to generate a unique slug.');
+        throw new RuntimeException('Failed to generate a unique slug after repeated collisions.');
+    }
+
+    private function handleSlugConflict(int $slugLength, int $conflicts): array
+    {
+        if ($conflicts <= 3) {
+            return [$slugLength, $conflicts];
+        }
+
+        $nextSlugLength = $slugLength + 1;
+
+        error_log(sprintf(
+            'Slug generation exceeded %d collisions with length %d. Increasing slug length to %d.',
+            $conflicts,
+            $slugLength,
+            $nextSlugLength,
+        ));
+
+        return [$nextSlugLength, 0];
     }
 }

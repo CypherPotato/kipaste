@@ -148,8 +148,20 @@ final class PageController
                             <i class="ri-close-line" aria-hidden="true"></i>
                         </button>
                     </div>
-                    <canvas id="qrCodeCanvas" class="qr-modal-canvas" width="420" height="420"></canvas>
-                    <a id="qrCodeLink" class="qr-modal-link" href="#" target="_blank" rel="noopener noreferrer"></a>
+                    <div class="qr-modal-tabs" role="tablist" aria-label="Paste share options">
+                        <button id="qrCodeTabQr" class="qr-modal-tab active" type="button" role="tab" aria-selected="true" aria-controls="qrCodePanelQr">
+                            QR Code
+                        </button>
+                        <button id="qrCodeTabLink" class="qr-modal-tab" type="button" role="tab" aria-selected="false" aria-controls="qrCodePanelLink">
+                            Link
+                        </button>
+                    </div>
+                    <div id="qrCodePanelQr" class="qr-modal-panel" role="tabpanel" aria-labelledby="qrCodeTabQr">
+                        <canvas id="qrCodeCanvas" class="qr-modal-canvas" width="420" height="420"></canvas>
+                    </div>
+                    <div id="qrCodePanelLink" class="qr-modal-panel qr-modal-panel-link hidden" role="tabpanel" aria-labelledby="qrCodeTabLink">
+                        <a id="qrCodeLink" class="qr-modal-link" href="#" target="_blank" rel="noopener noreferrer"></a>
+                    </div>
                 </div>
             </div>
 

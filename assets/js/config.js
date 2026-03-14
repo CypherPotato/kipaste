@@ -30,7 +30,8 @@ export function parseSlugFromLocation() {
     const params = new URLSearchParams(window.location.search);
     const value = params.get('paste');
     if (value !== null && value.trim() !== '') {
-        return value.replace(/[^a-f0-9]/gi, '').toLowerCase();
+        const normalizedSlug = value.replace(/[^a-z0-9]/gi, '').toLowerCase();
+        return normalizedSlug === '' ? null : normalizedSlug;
     }
 
     const normalizedBasePath = appConfig.basePath.replace(/\/$/, '');
@@ -40,12 +41,12 @@ export function parseSlugFromLocation() {
         pathname = pathname.slice(normalizedBasePath.length);
     }
 
-    const directSlugMatch = pathname.match(/^\/([a-f0-9]+)$/i);
+    const directSlugMatch = pathname.match(/^\/([a-z0-9]+)$/i);
     if (directSlugMatch !== null) {
         return directSlugMatch[1].toLowerCase();
     }
 
-    const prefixedSlugMatch = pathname.match(/^\/p\/([a-f0-9]+)$/i);
+    const prefixedSlugMatch = pathname.match(/^\/p\/([a-z0-9]+)$/i);
     if (prefixedSlugMatch !== null) {
         return prefixedSlugMatch[1].toLowerCase();
     }

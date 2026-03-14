@@ -26,17 +26,17 @@ final class PasteApiController
                 return;
             }
 
-            if ($method === 'GET' && preg_match('#^/api/pastes/([a-f0-9]+)$#', $path, $matches) === 1) {
+            if ($method === 'GET' && preg_match('#^/api/pastes/([a-z0-9]+)$#i', $path, $matches) === 1) {
                 $this->showPaste($matches[1], $clientIp);
                 return;
             }
 
-            if ($method === 'POST' && preg_match('#^/api/pastes/([a-f0-9]+)/fork$#', $path, $matches) === 1) {
+            if ($method === 'POST' && preg_match('#^/api/pastes/([a-z0-9]+)/fork$#i', $path, $matches) === 1) {
                 $this->forkPaste($matches[1], $body, $clientIp, $appBaseUrl);
                 return;
             }
 
-            if ($method === 'DELETE' && preg_match('#^/api/pastes/([a-f0-9]+)$#', $path, $matches) === 1) {
+            if ($method === 'DELETE' && preg_match('#^/api/pastes/([a-z0-9]+)$#i', $path, $matches) === 1) {
                 $this->deletePaste($matches[1], $clientIp);
                 return;
             }

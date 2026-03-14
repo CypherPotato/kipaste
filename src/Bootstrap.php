@@ -32,9 +32,10 @@ if (!is_dir($databaseDirectory)) {
 
 $databasePath = $databaseDirectory . '/pastes.sqlite';
 $repository = new SQLitePasteRepository($databasePath);
-$slugService = new SlugService();
 $options = new SupportedOptions();
 $maxPasteChars = max(1, (int) (envValue('PASTE_MAX_CHARS') ?? '50000'));
+$pasteSlugLength = max(1, (int) (envValue('PASTE_SLUG_LENGTH') ?? '4'));
+$slugService = new SlugService($pasteSlugLength);
 $pasteService = new PasteService($repository, $slugService, $options, $maxPasteChars);
 
 $recaptchaMinScore = (float) (envValue('RECAPTCHA_MIN_SCORE') ?? '0.5');
