@@ -140,14 +140,36 @@ async function createPaste(request, env) {
     return error("Could not allocate a shortcode.", 503);
 }
 
-async function getPaste(code, env) {
-    const now = Math.floor(Date.now() / 1000);
-
-    const paste = await env.DB.prepare(`
+async function viewPaste(code, env) {
+    return env.DB.prepare(`
         UPDATE pastes SET views = views + 1
         WHERE code = ? AND expires_at > ?
         RETURNING code, content, language, salt, iv, views, created_at, expires_at
-    `).bind(code, now).first();
+    `).bind(code, Math.floor(Date.now() / 1000)).first();
+}
+
+function text(body, status) {
+    return new Response(body, {
+        status,
+        headers: {
+            "content-type": "text/plain; charset=utf-8",
+            "cache-control": "no-store",
+            "x-content-type-options": "nosniff"
+        }
+    });
+}
+
+async function getRawPaste(code, env) {
+    const paste = await viewPaste(code, env);
+
+    if (!paste) return text("Paste not found.\n", 404);
+    if (paste.salt) return text("This paste is password protected and cannot be served raw.\n", 403);
+
+    return text(paste.content, 200);
+}
+
+async function getPaste(code, env) {
+    const paste = await viewPaste(code, env);
 
     if (!paste) return error("Paste not found.", 404);
 
@@ -179,8 +201,15 @@ export default {
     async fetch(request, env) {
         const url = new URL(request.url);
         const match = url.pathname.match(/^\/api\/pastes\/([a-z0-9]{1,16})$/);
+        const rawMatch = url.pathname.match(/^\/([a-z0-9]{1,16})$/);
 
         try {
+            if (rawMatch && url.searchParams.has("raw") && request.method === "GET") {
+                return await getRawPaste(rawMatch[1], env);
+            }
+
+            if (!url.pathname.startsWith("/api/")) return env.ASSETS.fetch(request);
+
             if (url.pathname === "/api/config" && request.method === "GET") {
                 return json({ maxChars: limits(env).maxChars, expirations: Object.keys(EXPIRATIONS) });
             }

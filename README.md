@@ -28,6 +28,7 @@ Edit `vars` in `wrangler.json`:
 - **Passwords**: content is encrypted in the browser with AES-256-GCM (PBKDF2-SHA256, 250k iterations). The server only stores ciphertext, salt and IV; the password never leaves the browser.
 - **Ownership**: creating a paste returns an owner token, kept in `localStorage`. Only the creator's browser shows the delete button, and the server checks the token hash.
 - **Abuse metrics**: every creation attempt is recorded in `create_events` (hashed IP, timestamp, size, blocked flag) and used for the per-IP rate limits.
+- **Raw**: `/<code>?raw` (any value) returns the paste as `text/plain`. Password-protected pastes return `403`, since the server only holds ciphertext.
 - **Cleanup**: a cron (`*/15 * * * *`) deletes expired pastes and create events older than 24h. Expired pastes are also hidden immediately on read.
 
 Test the cron locally with `curl "http://localhost:8787/__scheduled?cron=*/15+*+*+*+*"`.
