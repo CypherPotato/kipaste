@@ -95,9 +95,14 @@ function renderPaste() {
     setMode("view");
     document.title = `${paste.code} · Ki`;
 
-    $("paste-meta").innerHTML = "";
-    $("paste-meta").append(...[
-        paste.code,
+    const shortcode = Object.assign(document.createElement("button"), {
+        className: "shortcode",
+        textContent: paste.code,
+        title: "Copy link",
+        onclick: () => copyText(`${location.origin}/${paste.code}`, "Link copied.")
+    });
+
+    $("paste-meta").replaceChildren(shortcode, ...[
         `${paste.views} ${paste.views === 1 ? "view" : "views"}`,
         `created ${relativeTime(now - paste.createdAt)} ago`,
         `expires in ${relativeTime(paste.expiresAt - now)}`

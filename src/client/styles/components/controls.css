@@ -115,12 +115,21 @@ button {
     overflow: hidden;
 }
 
-.paste-meta span:first-child {
+.paste-meta .shortcode {
+    padding: 0;
+    background: none;
+    border: 0;
     color: var(--text);
     font-family: var(--font-mono);
+    cursor: pointer;
 }
 
-.paste-meta span + span::before {
+.paste-meta .shortcode:hover {
+    color: var(--accent);
+    text-decoration: underline;
+}
+
+.paste-meta > * + *::before {
     content: "•";
     margin: 0 8px;
     color: var(--faint);
