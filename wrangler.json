@@ -1,0 +1,43 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "ki",
+  "main": "src/worker/index.js",
+  "compatibility_date": "2026-09-01",
+  "routes": [
+    {
+      "pattern": "ki.proj.pw",
+      "custom_domain": true
+    }
+  ],
+  "build": {
+    "command": "bun run build",
+    "watch_dir": "src/client"
+  },
+  "assets": {
+    "directory": "public",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": [
+      "/api/*",
+      "/__scheduled"
+    ]
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "ki",
+      "database_id": "e0a77832-c1b0-4a8b-9e1d-cc6feae47a4f",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "triggers": {
+    "crons": [
+      "*/15 * * * *"
+    ]
+  },
+  "vars": {
+    "MAX_PASTE_CHARS": "500000",
+    "CREATE_LIMIT_PER_MINUTE": "10",
+    "CREATE_LIMIT_PER_HOUR": "60",
+    "CREATE_LIMIT_PER_DAY": "300"
+  }
+}

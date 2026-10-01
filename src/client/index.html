@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Ki</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%231d5fd6'/><text x='16' y='22' font-family='monospace' font-size='16' font-weight='700' text-anchor='middle' fill='white'>ki</text></svg>">
+    <script>
+        document.documentElement.dataset.theme = localStorage.getItem("ki:theme") ?? "system";
+    </script>
+    <link rel="stylesheet" href="./styles/index.css">
+</head>
+<body>
+    <header class="toolbar">
+        <div class="toolbar-group" id="edit-actions" hidden>
+            <label class="field field-language">
+                <i class="ri-code-s-slash-line"></i>
+                <select id="language" aria-label="Language"></select>
+                <i class="ri-arrow-down-s-line"></i>
+            </label>
+
+            <label class="field field-expiration">
+                <i class="ri-timer-flash-line"></i>
+                <select id="expiration" aria-label="Expiration"></select>
+                <i class="ri-arrow-down-s-line"></i>
+            </label>
+
+            <button class="button" id="publish" title="Publish (Ctrl+S)">
+                <i class="ri-upload-cloud-2-line"></i>
+                <span>Publish</span>
+            </button>
+
+            <button class="icon-button" id="password" title="Set password">
+                <i class="ri-lock-unlock-line"></i>
+            </button>
+        </div>
+
+        <span class="spacer"></span>
+
+        <div class="toolbar-group" id="view-actions" hidden>
+            <div class="paste-meta" id="paste-meta"></div>
+
+            <span class="divider"></span>
+
+            <button class="icon-button" id="download" title="Download"><i class="ri-download-2-line"></i></button>
+            <button class="icon-button" id="copy" title="Copy"><i class="ri-file-copy-2-line"></i></button>
+            <button class="icon-button" id="qrcode" title="QR Code"><i class="ri-qr-code-line"></i></button>
+
+            <span class="divider"></span>
+
+            <button class="icon-button" id="fork" title="Fork"><i class="ri-git-fork-line"></i></button>
+            <button class="icon-button danger" id="delete" title="Delete" hidden><i class="ri-delete-bin-6-line"></i></button>
+            <button class="icon-button" id="new" title="New paste"><i class="ri-add-line"></i></button>
+            <span class="divider"></span>
+        </div>
+
+        <button class="icon-button" id="theme" title="Theme"></button>
+    </header>
+
+    <main id="body">
+        <textarea id="editor" spellcheck="false" placeholder="Paste or type here..." hidden></textarea>
+        <div class="char-counter" id="char-counter" hidden></div>
+
+        <div class="code-view" id="code-view" hidden>
+            <div class="line-numbers" id="line-numbers" aria-hidden="true"></div>
+            <pre><code class="hljs" id="code"></code></pre>
+        </div>
+
+        <article class="markdown-view" id="markdown-view" hidden></article>
+
+        <div class="message" id="message" hidden></div>
+    </main>
+
+    <dialog class="modal" id="qr-dialog">
+        <header>
+            <h2>QR Code</h2>
+            <button class="icon-button" data-close title="Close"><i class="ri-close-line"></i></button>
+        </header>
+
+        <div class="tabs" role="tablist">
+            <button role="tab" data-tab="qr" aria-selected="true">QR Code</button>
+            <button role="tab" data-tab="link" aria-selected="false">Link</button>
+        </div>
+
+        <div class="tab-panel" data-panel="qr">
+            <div class="qr-box" id="qr-box"></div>
+        </div>
+
+        <div class="tab-panel" data-panel="link" hidden>
+            <div class="link-box">
+                <input id="share-link" readonly>
+                <button class="button" id="copy-link"><i class="ri-file-copy-2-line"></i><span>Copy</span></button>
+            </div>
+        </div>
+    </dialog>
+
+    <dialog class="modal modal-small" id="password-dialog">
+        <form method="dialog" id="password-form">
+            <header>
+                <h2 id="password-title">Password</h2>
+                <button class="icon-button" type="button" data-close title="Close"><i class="ri-close-line"></i></button>
+            </header>
+
+            <p class="hint" id="password-hint"></p>
+            <input type="password" id="password-input" autocomplete="new-password" placeholder="Password">
+            <p class="form-error" id="password-error" hidden></p>
+
+            <footer>
+                <button class="button" type="button" id="password-clear">Remove</button>
+                <button class="button primary" type="submit" id="password-submit">Confirm</button>
+            </footer>
+        </form>
+    </dialog>
+
+    <script type="module" src="./scripts/main.js"></script>
+</body>
+</html>

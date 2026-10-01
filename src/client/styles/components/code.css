@@ -1,0 +1,145 @@
+#editor,
+.code-view {
+    font: 15px/1.6 var(--font-mono);
+    tab-size: 4;
+}
+
+#editor {
+    flex: 1;
+    width: 100%;
+    padding: 24px 32px;
+    background: transparent;
+    border: 0;
+    outline: none;
+    color: var(--text);
+    resize: none;
+    white-space: pre;
+}
+
+#editor::placeholder {
+    color: var(--faint);
+}
+
+.char-counter {
+    position: fixed;
+    right: 16px;
+    bottom: 12px;
+    padding: 2px 10px;
+    background: var(--bg);
+    border-radius: 999px;
+    color: var(--faint);
+    font-size: 12px;
+    pointer-events: none;
+}
+
+.char-counter.over {
+    color: var(--danger);
+    font-weight: 600;
+}
+
+.code-view {
+    display: flex;
+    padding: 24px 0;
+    overflow-x: auto;
+}
+
+.line-numbers {
+    position: sticky;
+    left: 0;
+    flex-shrink: 0;
+    min-width: 64px;
+    padding: 0 12px 0 16px;
+    background: var(--bg);
+    border-right: 1px solid var(--border);
+    color: var(--faint);
+    text-align: right;
+    white-space: pre;
+    user-select: none;
+}
+
+.code-view pre {
+    flex: 1;
+    margin: 0;
+    padding: 0 24px 0 12px;
+    font: inherit;
+}
+
+.code-view code {
+    font: inherit;
+}
+
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-built_in,
+.hljs-type,
+.hljs-doctag {
+    color: var(--hl-keyword);
+}
+
+.hljs-string,
+.hljs-regexp,
+.hljs-template-tag,
+.hljs-symbol {
+    color: var(--hl-string);
+}
+
+.hljs-number,
+.hljs-literal,
+.hljs-variable.constant_ {
+    color: var(--hl-number);
+}
+
+.hljs-comment,
+.hljs-quote {
+    color: var(--hl-comment);
+    font-style: italic;
+}
+
+.hljs-title,
+.hljs-section,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class {
+    color: var(--hl-title);
+}
+
+.hljs-attr,
+.hljs-attribute,
+.hljs-property,
+.hljs-params {
+    color: var(--hl-attr);
+}
+
+.hljs-meta,
+.hljs-tag,
+.hljs-bullet,
+.hljs-link {
+    color: var(--hl-meta);
+}
+
+.hljs-deletion {
+    color: var(--hl-deletion);
+}
+
+.hljs-addition {
+    color: var(--hl-addition);
+}
+
+.hljs-emphasis {
+    font-style: italic;
+}
+
+.hljs-strong {
+    font-weight: 700;
+}
+
+@media (max-width: 720px) {
+    #editor {
+        padding: 16px;
+    }
+
+    .line-numbers {
+        min-width: 44px;
+        padding: 0 8px;
+    }
+}

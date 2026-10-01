@@ -1,0 +1,87 @@
+:root {
+    --font-ui: "Segoe UI", system-ui, -apple-system, sans-serif;
+    --font-mono: "Cascadia Mono", "JetBrains Mono", Consolas, "SF Mono", monospace;
+    --radius: 8px;
+    --toolbar-height: 56px;
+
+    --bg: #f5f6fa;
+    --surface: #ffffff;
+    --control: #e9edf6;
+    --control-hover: #dde3ef;
+    --border: #e1e5ee;
+    --text: #1d2433;
+    --muted: #66708a;
+    --faint: #9aa3b8;
+    --accent: #1d5fd6;
+    --accent-soft: #d6e3fb;
+    --danger: #e0294d;
+    --overlay: rgb(20 24 33 / 0.55);
+
+    --hl-keyword: #a626a4;
+    --hl-string: #2a7b34;
+    --hl-number: #b35c00;
+    --hl-comment: #8a93a6;
+    --hl-title: #1d5fd6;
+    --hl-attr: #1f2f9e;
+    --hl-meta: #0e7c86;
+    --hl-deletion: #c62043;
+    --hl-addition: #2a7b34;
+
+    color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+    --bg: #14171f;
+    --surface: #1b1f29;
+    --control: #232937;
+    --control-hover: #2c3445;
+    --border: #262c3a;
+    --text: #dfe4ee;
+    --muted: #98a1b6;
+    --faint: #5d667b;
+    --accent: #6e9eff;
+    --accent-soft: #24365c;
+    --danger: #ff5c7a;
+    --overlay: rgb(0 0 0 / 0.6);
+
+    --hl-keyword: #d394f0;
+    --hl-string: #9bd88a;
+    --hl-number: #f2b26b;
+    --hl-comment: #6b7489;
+    --hl-title: #7fb0ff;
+    --hl-attr: #9fc3ff;
+    --hl-meta: #6fd3dc;
+    --hl-deletion: #ff7b93;
+    --hl-addition: #9bd88a;
+
+    color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root[data-theme="system"] {
+        --bg: #14171f;
+        --surface: #1b1f29;
+        --control: #232937;
+        --control-hover: #2c3445;
+        --border: #262c3a;
+        --text: #dfe4ee;
+        --muted: #98a1b6;
+        --faint: #5d667b;
+        --accent: #6e9eff;
+        --accent-soft: #24365c;
+        --danger: #ff5c7a;
+        --overlay: rgb(0 0 0 / 0.6);
+
+        --hl-keyword: #d394f0;
+        --hl-string: #9bd88a;
+        --hl-number: #f2b26b;
+        --hl-comment: #6b7489;
+        --hl-title: #7fb0ff;
+        --hl-attr: #9fc3ff;
+        --hl-meta: #6fd3dc;
+        --hl-deletion: #ff7b93;
+        --hl-addition: #9bd88a;
+
+        color-scheme: dark;
+    }
+}

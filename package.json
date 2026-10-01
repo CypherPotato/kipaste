@@ -1,0 +1,20 @@
+{
+  "name": "ki",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "bun build src/client/index.html --outdir public --public-path / --minify",
+    "dev": "wrangler d1 migrations apply ki --local && wrangler dev --test-scheduled",
+    "deploy": "bun scripts/deploy.mjs"
+  },
+  "dependencies": {
+    "dompurify": "^3.4.16",
+    "highlight.js": "^11.12.0",
+    "marked": "^18.0.14",
+    "qrcode-generator": "^2.0.4",
+    "remixicon": "^4.9.1"
+  },
+  "devDependencies": {
+    "wrangler": "^4.146.0"
+  }
+}
